@@ -1,210 +1,237 @@
-# LSTM and RNN Tutorial with Demo (with Stock/Bitcoin Time Series Prediction, Sentiment Analysis, Music Generation)
+# Учебное пособие по LSTM и RNN с демонстрацией (с прогнозированием временных рядов акций/биткоинов, анализом настроений, генерацией музыки)
 
-There are many LSTM tutorials, courses, papers in the internet. This one summarizes all of them. In this tutorial, RNN Cell, RNN Forward and Backward Pass, LSTM Cell, LSTM Forward Pass, Sample LSTM Project: Prediction of Stock Prices Using LSTM network, Sample LSTM Project: Sentiment Analysis, Sample LSTM Project: Music Generation. It will continue to be updated over time.
+В интернете существует множество учебных пособий, курсов и статей по LSTM. В этом пособии собраны все материалы. В данном учебном пособии рассматриваются: ячейка RNN, прямой и обратный проход RNN, ячейка LSTM, прямой проход LSTM, пример проекта LSTM: прогнозирование цен акций с использованием сети LSTM, пример проекта LSTM: анализ настроений, пример проекта LSTM: генерация музыки. Материал будет постоянно обновляться.
 
-**Keywords: Deep Learning, LSTM, RNN, Stock/Bitcoin price prediction, Sentiment Analysis, Music Generation, Sample Code, Basic LSTM, Basic RNN**
+**Ключевые слова: глубокое обучение, LSTM, RNN, прогнозирование цен акций/биткоинов, анализ настроений, генерация музыки, пример кода, базовый LSTM, базовый RNN**
 
-**NOTE: This tutorial is only for education purpose. It is not academic study/paper. All related references are listed at the end of the file.**
+**ПРИМЕЧАНИЕ: Данное учебное пособие предназначено только для образовательных целей. Это не академическое исследование/статья.** Все соответствующие ссылки перечислены в конце файла.**
 
-# Table of Contents
-- [What is Deep Learning?](#whatisDL)
-- [What is RNN?](#whatisRNN)
-    - [RNN Cell](#RNNCell)
-    - [RNN Forward Pass](#RNNForward)
-    - [RNN Backward Pass](#RNNBackward)
-    - [RNN Problem](#RNNProblem)
-- [What is LSTM?](#whatisLSTM)
-    - [LSTM Cell](#LSTMCell)
-    - [LSTM Forward Pass](#LSTMForward)
-- [SAMPLE LSTM CODE: Prediction of Stock Prices Using LSTM network](#SampleStock)
-- [SAMPLE LSTM CODE: Sentiment Analysis](#Sentiment)
-    - [Results](#SentimentResults)
-    - [DataSet](#SentimentDataSet)
-    - [Embeddings](#SentimentEmbeddings)
-    - [LSTM Model in Sentiment Analysis](#SentimentLSTM)
-- [SAMPLE LSTM CODE: Music Generation](#MusicGeneration)
-    - [How to Run Code?](#MusicHowToRunCode)
-    - [Input File and Parameters](#MusicInput)
-    - [LSTM Model in Music Generation](#MusicLSTM)
-    - [Predicting and Sampling](#MusicPredictingAndSampling)
-- [Resources](#Resources)
-- [References](#References)
-  
-  
-## What is Deep Learning (DL)? <a name="whatisDL"></a>
+# Оглавление
+- [Что такое глубокое обучение?](#whatisDL)
+- [Что такое RNN?](#whatisRNN)
 
-"Deep Learning is a subfield of machine learning concerned with algorithms inspired by the structure and function of the brain called artificial neural networks." There are different types of DL models: Convolutional Neural Network, Recurrent Neural Networks (RNN), Long Short Term Memory (LSTM), Restricted Boltzmann Machine (RBM), Deep Belief Networks, etc.
+- [Ячейка RNN](#RNNCell)
 
-In this tutorial, we are focusing on recurrent networks, especially LSTM. Basic RNN structure, Basic LSTM structures and Stock/Bitcoin Price Prediction Sample code are presented in the following sections. 
+- [Прямой проход RNN](#RNNForward)
 
+- [Обратный проход RNN](#RNNBackward)
 
-## What is RNN? <a name="whatisRNN"></a>
+- [Проблема RNN](#RNNProblem)
+- [Что такое LSTM?](#whatisLSTM)
 
-* Recurrent neural network (RNN) is a type of deep learning model that is mostly used for analysis of sequential data (time series data prediction). 
-* There are different application areas that are used: Language model, neural machine translation, music generation, time series prediction, financial prediction, etc. 
-* The aim of this implementation is to help to learn structure of basic RNN (RNN cell forward, RNN cell backward, etc..).
-* Code is adapted from Andrew Ng's Course 'Sequential models'.
+- [Ячейка LSTM](#LSTMCell)
 
-Code: https://github.com/omerbsezer/LSTM_RNN_Tutorials_with_Demo/tree/master/BasicRNN
+- [Прямой проход LSTM](#LSTMForward)
+- [Пример кода LSTM: Прогнозирование цен акций с использованием сети LSTM](#SampleStock)
+- [Пример кода LSTM: Анализ настроений](#Sentiment)
 
+- [Результаты](#SentimentResults)
 
-### RNN Cell <a name="RNNCell"></a>
+- [Набор данных](#SentimentDataSet)
+
+- [Встраивания](#SentimentEmbeddings)
+
+- [Модель LSTM в анализе настроений](#SentimentLSTM)
+- [ПРИМЕР КОДА LSTM: Генерация музыки](#MusicGeneration)
+
+- [Как запустить код?](#MusicHowToRunCode)
+
+- [Входной файл и параметры](#MusicInput)
+
+- [Модель LSTM в генерации музыки](#MusicLSTM)
+
+- [Прогнозирование и выборка](#MusicPredictingAndSampling)
+- [Ресурсы](#Resources)
+- [Ссылки](#References)
+
+## Что такое глубокое обучение (DL)? <a name="whatisDL"></a>
+
+«Глубокое обучение — это подраздел машинного обучения, занимающийся алгоритмами, вдохновленными структурой и функциями мозга, называемыми искусственными нейронными сетями». Существуют различные типы моделей глубокого обучения: сверточные нейронные сети, рекуррентные нейронные сети (RNN), сети с долговременной кратковременной памятью (LSTM), ограниченные машины Больцмана (RBM), глубокие сети доверия и т. д.
+
+В этом руководстве мы сосредоточимся на рекуррентных сетях, особенно на LSTM. Базовая структура RNN, базовые структуры LSTM и пример кода для прогнозирования цен акций/биткоина представлены в следующих разделах.
+
+## Что такое RNN?
+
+* Рекуррентная нейронная сеть (RNN) — это тип модели глубокого обучения, которая в основном используется для анализа последовательных данных (прогнозирование данных временных рядов).
+
+* Существуют различные области применения: языковые модели, нейронный машинный перевод, генерация музыки, прогнозирование временных рядов, финансовое прогнозирование и т. д.
+* Цель этой реализации — помочь изучить структуру базовой RNN (прямое направление ячейки RNN, обратное направление ячейки RNN и т. д.).
+
+* * Код адаптирован из курса Эндрю Нга «Последовательные модели».
+
+Код: https://github.com/omerbsezer/LSTM_RNN_Tutorials_with_Demo/tree/master/BasicRNN
+
+### Ячейка RNN <a name="RNNCell"></a>
 
 <img width="961" alt="rnn_step_forward" src="https://user-images.githubusercontent.com/10358317/44312581-5a33c700-a403-11e8-968d-a38dd0ab4401.png">
 
-[Andrew Ng, Sequential Models Course, Deep Learning Specialization]
+[Эндрю Нг, Курс по последовательным моделям, Специализация по глубокому обучению]
 
-### RNN Forward Pass <a name="RNNForward"></a>
+### Прямой проход RNN <a name="RNNForward"></a>
 
 <img width="811" alt="rnn_fw" src="https://user-images.githubusercontent.com/10358317/44312584-6029a800-a403-11e8-9171-38cb22873bbb.png">
 
-[Andrew Ng, Sequential Models Course, Deep Learning Specialization]
+[Эндрю Нг, Курс по последовательным моделям, Специализация по глубокому обучению]
 
-### RNN Backward Pass <a name="RNNBackward"></a>
+### Обратный проход RNN <a name="RNNBackward"></a>
 
 <img width="851" alt="rnn_cell_backprop" src="https://user-images.githubusercontent.com/10358317/44312587-661f8900-a403-11e8-831b-2cd7fae23dfb.png">
 
-[Andrew Ng, Sequential Models Course, Deep Learning Specialization]
+[Эндрю Нг, Курс по последовательным моделям, Специализация по глубокому обучению]
 
-### RNN Problem <a name="RNNProblem"></a>
-- In theory, RNNs are absolutely capable of handling such “long-term dependencies.” 
-- In practice, RNNs don’t seem to be able to learn them. 
-- The problem was explored in depth by Hochreiter (1991) [German] and Bengio, et al. (1994) with [LSTM](https://www.bioinf.jku.at/publications/older/2604.pdf)
 
-## What is LSTM? <a name="whatisLSTM"></a>
 
-- It is a special type of RNN, capable of learning long-term dependencies.
+### Проблема RNN <a name="RNNProblem"></a>
+- Теоретически, RNN абсолютно способны обрабатывать такие «долгосрочные зависимости».
 
-- "Long short-term memory (LSTM) units are units of a recurrent neural network (RNN). An RNN composed of LSTM units is often called an LSTM network. A common LSTM unit is composed of a cell, an input gate, an output gate and a forget gate. The cell remembers values over arbitrary time intervals and the three gates regulate the flow of information into and out of the cell"
+- На практике RNN, похоже, не способны их изучать.
+- Эта проблема была подробно исследована Хохрайтером (1991) [на немецком языке] и Бенджио и др. (1994) с помощью [LSTM](https://www.bioinf.jku.at/publications/older/2604.pdf)
 
-- Long Short Term Memory (LSTM) is a type of deep learning model that is mostly used for analysis of sequential data (time series data prediction). 
+## Что такое LSTM? <a name="whatisLSTM"></a>
 
-- There are different application areas that are used: Language model, Neural machine translation, Music generation, Time series prediction, Financial prediction, Robot control, Time series prediction, Speech recognition, Rhythm learning, Music composition, Grammar learning, Handwriting recognition, Human action recognition, Sign Language Translation,Time series anomaly detection, Several prediction tasks in the area of business process management, Prediction in medical care pathways, Semantic parsing, Object Co-segmentation.
+- Это особый тип RNN, способный изучать долгосрочные зависимости.
 
-- LSTM was proposed in 1997 by Sepp Hochreiter and Jürgen Schmidhuber and improved in 2000 by Felix Gers' team.
-[Paper](https://www.bioinf.jku.at/publications/older/2604.pdf) 
 
-Code: https://github.com/omerbsezer/LSTM_RNN_Tutorials_with_Demo/tree/master/BasicLSTM
+— «Единицы долговременной кратковременной памяти (LSTM) — это элементы рекуррентной нейронной сети (RNN). RNN, состоящая из элементов LSTM, часто называется сетью LSTM. Типичный элемент LSTM состоит из ячейки, входного вентиля, выходного вентиля и вентиля забывания. Ячейка запоминает значения за произвольные интервалы времени, а три вентиля регулируют поток информации в ячейку и из нее».
 
-### LSTM Cell <a name="LSTMCell"></a>
+— Долговременная кратковременная память (LSTM) — это тип модели глубокого обучения, которая в основном используется для анализа последовательных данных (прогнозирование данных временных рядов).
+
+— Существуют различные области применения: языковое моделирование, нейронный машинный перевод, генерация музыки, прогнозирование временных рядов, финансовое прогнозирование, управление роботами, распознавание речи, изучение ритма, музыкальная композиция, изучение грамматики, распознавание рукописного текста, распознавание действий человека, перевод языка жестов, обнаружение аномалий во временных рядах, различные задачи прогнозирования в области управления бизнес-процессами, прогнозирование в медицинских маршрутах, семантический анализ, ко-сегментация объектов.
+
+
+— Технология LSTM была предложена в 1997 году Зеппом Хохрайтером и Юргеном Шмидхубером и усовершенствована в 2000 году командой Феликса Герса.
+
+[Статья](https://www.bioinf.jku.at/publications/older/2604.pdf)
+
+Код: https://github.com/omerbsezer/LSTM_RNN_Tutorials_with_Demo/tree/master/BasicLSTM
+
+### Ячейка LSTM <a name="LSTMCell"></a>
 
 <img width="886" alt="lstm_cell" src="https://user-images.githubusercontent.com/10358317/44312843-34a8bc80-a407-11e8-96c3-cc2bc07f1500.png">
 
-[Andrew Ng, Sequential Models Course, Deep Learning Specialization]
+[Эндрю Нг, Курс по последовательным моделям, Специализация по глубокому обучению]
 
-### LSTM Forward Pass <a name="LSTMForward"></a>
+### Прямой проход LSTM <a name="LSTMForward"></a>
 
 <img width="860" alt="lstm_fw" src="https://user-images.githubusercontent.com/10358317/44312846-3a060700-a407-11e8-878e-f1ce14cc98b4.png">
 
-[Andrew Ng, Sequential Models Course, Deep Learning Specialization]
+[Эндрю Нг, Курс по последовательным моделям, Специализация по глубокому обучению]
 
+## ПРИМЕР КОДА LSTM: Прогнозирование цен акций с использованием сети LSTM <a name="SampleStock"></a>
+Цены акций и ETF прогнозируются с использованием сети LSTM (Keras-Tensorflow).
 
-## SAMPLE LSTM CODE: Prediction of Stock Prices Using LSTM network <a name="SampleStock"></a>
-Stock and ETFs prices are predicted using LSTM network (Keras-Tensorflow).
+Код: https://github.com/omerbsezer/LSTM_RNN_Tutorials_with_Demo/tree/master/StockPricesPredictionProject
 
-Code: https://github.com/omerbsezer/LSTM_RNN_Tutorials_with_Demo/tree/master/StockPricesPredictionProject
+- Цены акций загружаются с [finance.yahoo.com](https://finance.yahoo.com/). [CSV-файл с ценами акций Disneyland (DIS)](https://github.com/omerbsezer/LSTM_RNN_Tutorials_with_Stock_Prices_Prediction/blob/master/Stock_Prices_Prediction_Example/DIS.csv).
 
-- Stock prices are downloaded from [finance.yahoo.com](https://finance.yahoo.com/). [Disneyland (DIS) Stock Price CSV file](https://github.com/omerbsezer/LSTM_RNN_Tutorials_with_Stock_Prices_Prediction/blob/master/Stock_Prices_Prediction_Example/DIS.csv).
-- Closed value (column[5]) is used in the network, [LSTM Code](https://github.com/omerbsezer/LSTM_RNN_Tutorials_with_Stock_Prices_Prediction/blob/master/Stock_Prices_Prediction_Example/pricePredictionLSTM.py)
-- Values are normalized in range (0,1).
-- Datasets are splitted into train and test sets, 50% test data, 50% training data.
-- Keras-Tensorflow is used for implementation.
-- LSTM network consists of 25 hidden neurons, and 1 output layer (1 dense layer).
-- LSTM network features input: 1 layer, output: 1 layer , hidden: 25 neurons, optimizer:adam, dropout:0.1, timestep:240, batchsize:240, epochs:1000 (features can be further optimized).
-- Root mean squared errors are calculated.
-- Output files:  [lstm_results](https://github.com/omerbsezer/LSTM_RNN_Tutorials_with_Stock_Prices_Prediction/blob/master/Stock_Prices_Prediction_Example/lstm_result.csv) (consists of prediction and actual values), plot file (actual and prediction values).
+- В сети используется закрытое значение (столбец[5]), [код LSTM](https://github.com/omerbsezer/LSTM_RNN_Tutorials_with_Stock_Prices_Prediction/blob/master/Stock_Prices_Prediction_Example/pricePredictionLSTM.py)
+- Значения нормализованы в диапазоне (0,1).
+
+- Наборы данных разделены на обучающую и тестовую выборки: 50% тестовых данных, 50% обучающих данных.
+
+- Для реализации используется Keras-Tensorflow.
+
+- Сеть LSTM состоит из 25 скрытых нейронов и 1 выходного слоя (1 полносвязный слой).
+
+- Входные данные сети LSTM: 1 слой, выходные данные: 1 слой, скрытые нейроны: 25, оптимизатор: Adam, Dropout: 0.1, шаг по времени: 240, размер пакета: 240, эпох: 1000 (признаки могут быть дополнительно оптимизированы).
+
+- Вычисляются среднеквадратичные ошибки.
+
+- Выходные файлы: [lstm_results](https://github.com/omerbsezer/LSTM_RNN_Tutorials_with_Stock_Prices_Prediction/blob/master/Stock_Prices_Prediction_Example/lstm_result.csv) (содержит прогнозируемые и фактические значения), файл графика (фактические и прогнозируемые значения).
 
 ![dis_prediction_and_actualprice](https://user-images.githubusercontent.com/10358317/37895737-e01ed832-30ea-11e8-9249-9b69ae2eccff.png)
 
-## SAMPLE LSTM CODE: Sentiment Analysis <a name="Sentiment"></a>
 
-Sentiment Analysis is an analysis of the sentence, text at the document that gives us the opinion of the sentence/text. In this project, it will be implemented a model which inputs a sentence and finds the most appropriate emoji to be used with this sentence. Code is adapted from Andrew Ng's Course 'Sequential Models'.
+## ПРИМЕР КОДА LSTM: Анализ настроения <a name="Sentiment"></a>
 
-**NOTE:This project is adapted from Andrew Ng, [Sequential Models Course](https://github.com/Kulbear/deep-learning-coursera/tree/master/Sequence%20Models), [Deep Learning Specialization](https://www.coursera.org/specializations/deep-learning) for educational purpose**
+Анализ настроения — это анализ предложения, текста в документе, который позволяет определить, какое мнение о нём сложилось. В этом проекте будет реализована модель, которая принимает на вход предложение и находит наиболее подходящий эмодзи для этого предложения. Код адаптирован из курса Эндрю Нга «Последовательные модели».
 
-Code: https://github.com/omerbsezer/LSTM_RNN_Tutorials_with_Demo/tree/master/SentimentAnalysisProject
+**ПРИМЕЧАНИЕ: Этот проект адаптирован из курса Эндрю Нга по последовательным моделям (https://github.com/Kulbear/deep-learning-coursera/tree/master/Sequence%20Models), специализации по глубокому обучению (https://www.coursera.org/specializations/deep-learning) в образовательных целях**
 
-### Results <a name="SentimentResults"></a>
+Код: https://github.com/omerbsezer/LSTM_RNN_Tutorials_with_Demo/tree/master/SentimentAnalysisProject
+
+### Результаты <a name="SentimentResults"></a>
 
 ![resultsemoji](https://user-images.githubusercontent.com/10358317/43802983-1fe753e4-9aa0-11e8-9b9e-b87fe91e0c18.jpg)
 
-### DataSet <a name="SentimentDataSet"></a>
-We have a tiny dataset (X, Y) where:
+### Набор данных <a name="SentimentDataSet"></a>
+У нас есть небольшой набор данных (X, Y), где:
 
-* X contains 127 sentences (strings)
-* Y contains a integer label between 0 and 4 corresponding to an emoji for each sentence
+* X содержит 127 предложений (строк)
+* Y содержит целочисленную метку от 0 до 4, соответствующую эмодзи для каждого предложения
 
 <img width="847" alt="data_set" src="https://user-images.githubusercontent.com/10358317/43802586-eac883e6-9a9e-11e8-8f13-6471cc16a3d8.png">
 
-[Andrew Ng, Sequential Models Course, Deep Learning Specialization]
+[Эндрю Нг, Курс по последовательным моделям, Специализация по глубокому обучению]
 
-### Embeddings <a name="SentimentEmbeddings"></a>
+### Встраивания <a name="SentimentEmbeddings"></a>
 
-Glove 50 dimension, 40000 words of dictionary file is used for word embeddings. It should be downloaded from  https://www.kaggle.com/watts2/glove6b50dtxt (file size = ~168MB))
+Для встраивания слов используется 50-мерный словарь Glove, содержащий 40000 слов. Его следует загрузить с https://www.kaggle.com/watts2/glove6b50dtxt (размер файла = ~168 МБ)
 
+* word_to_index: отображение слов в словарь на их индексы в словаре (400 001 слово, с допустимыми индексами от 0 до 400 000)
+* index_to_word: отображение индексов на соответствующие им слова в словаре
+* word_to_vec_map: отображение слов в словарь на их векторное представление GloVe.
 
-* word_to_index: dictionary mapping from words to their indices in the vocabulary (400,001 words, with the valid indices ranging from 0 to 400,000)
-* index_to_word: dictionary mapping from indices to their corresponding words in the vocabulary
-* word_to_vec_map: dictionary mapping words to their GloVe vector representation.
+### Модель LSTM в анализе настроений <a name="SentimentLSTM"></a>
 
-### LSTM Model in Sentiment Analysis <a name="SentimentLSTM"></a>
-
-LSTM structure is used for classification.
+Структура LSTM используется для классификации.
 
 <img width="833" alt="emojifier-v2" src="https://user-images.githubusercontent.com/10358317/43802664-22c08c8a-9a9f-11e8-83e1-fea4bf334f6e.png">
 
-[Andrew Ng, Sequential Models Course, Deep Learning Specialization]
+[Эндрю Нг, Курс по последовательным моделям, Специализация по глубокому обучению]
 
-Parameters:
+Параметры:
 
 ![lstm_struct](https://user-images.githubusercontent.com/10358317/43803021-416cc59e-9aa0-11e8-8b28-6045dd0ead87.jpg)
 
 
+## ПРИМЕР КОДА LSTM: Генерация музыки <a name="MusicGeneration"></a>
 
-## SAMPLE LSTM CODE: Music Generation  <a name="MusicGeneration"></a>
+С помощью обученной модели глубокого обучения (LSTM) можно прогнозировать новые последовательности временных рядов. В этом проекте будет реализована модель, которая принимает на вход образец джазовой музыки и генерирует/извлекает новую музыку. Код адаптирован из курса Эндрю Нга «Последовательные модели».
 
-With trained DL model (LSTM), new sequences of time series data can be predicted. In this project, it will be implemented a model which inputs a sample jazz music and samples/generates a new music. Code is adapted from Andrew Ng's Course 'Sequential models'.
+**ПРИМЕЧАНИЕ: Этот проект адаптирован из курса Эндрю Нга по последовательным моделям (https://github.com/Kulbear/deep-learning-coursera/tree/master/Sequence%20Models), специализации по глубокому обучению (https://www.coursera.org/specializations/deep-learning) в образовательных целях**
 
-**NOTE:This project is adapted from Andrew Ng, [Sequential Models Course](https://github.com/Kulbear/deep-learning-coursera/tree/master/Sequence%20Models), [Deep Learning Specialization](https://www.coursera.org/specializations/deep-learning) for educational purpose**
+Код: https://github.com/omerbsezer/LSTM_RNN_Tutorials_with_Demo/tree/master/MusicGenerationProject
 
-Code: https://github.com/omerbsezer/LSTM_RNN_Tutorials_with_Demo/tree/master/MusicGenerationProject
+### Как запустить код? <a name="MusicHowToRunCode"></a>
+* Чтобы запустить код, загрузите инструментарий music21 с [http://web.mit.edu/music21/](http://web.mit.edu/music21/). "pip install music21".
 
-### How to Run Code? <a name="MusicHowToRunCode"></a>
-* To run code, download music21 toolkit from [http://web.mit.edu/music21/](http://web.mit.edu/music21/). "pip install music21". 
-* Run main.py
+* Запуск main.py
 
+### Входной файл и параметры <a name="MusicInput"></a>
+Модель обучается с использованием "data/original_music"
+* "X, Y, n_values, indices_values ​​= load_music_utils()"
+* Количество обучающих примеров: 60,
+* Длина последовательности каждого обучающего примера: 30
+* Наша система генерации музыки будет использовать 78 уникальных значений.
 
-### Input File and Parameters <a name="MusicInput"></a>
-Model is trained with "data/original_music"
-* "X, Y, n_values, indices_values = load_music_utils()"
-* Number of training examples: 60,
-* Each of training examples length of sequence:30
-* Our music generation system will use 78 unique values. 
+* X: Это (m, Tx, 78)-мерный массив. У нас есть m обучающих примеров, каждый из которых представляет собой фрагмент из Tx=30 музыкальных значений. На каждом шаге по времени входными данными является одно из 78 различных возможных значений, представленных в виде one-hot вектора. Таким образом, например, X[i,t,:] — это one-hot вектор, представляющий значение i-го примера в момент времени t.
 
-* X: This is an (m,  Tx , 78) dimensional array. We have m training examples, each of which is a snippet of  Tx=30Tx=30  musical values. At each time step, the input is one of 78 different possible values, represented as a one-hot vector. Thus for example, X[i,t,:] is a one-hot vector representating the value of the i-th example at time t.
-* Y: This is essentially the same as X, but shifted one step to the left (to the past). 
-* n_values: The number of unique values in this dataset. This should be 78.
-* indices_values: python dictionary mapping from 0-77 to musical values.
+* Y: По сути, это то же самое, что и X, но сдвинутое на один шаг влево (в прошлое).
 
-### LSTM Model in Music Generation <a name="MusicLSTM"></a>
-LSTM model structure is:
+* n_values: Количество уникальных значений в этом наборе данных. Должно быть 78.
+* indices_values: словарь Python, сопоставляющий значения от 0 до 77 с музыкальными значениями.
+
+### Модель LSTM в генерации музыки <a name="MusicLSTM"></a>
+Структура модели LSTM:
 
 <img width="1163" alt="music_generation" src="https://user-images.githubusercontent.com/10358317/44003036-cde60b9a-9e54-11e8-88d4-88d8c9ad0144.png">
 
-[Andrew Ng, Sequential Models Course, Deep Learning Specialization]
+[Эндрю Нг, Курс по последовательным моделям, Специализация по глубокому обучению]
 
-Model is implemented with "djmodel(Tx, n_a, n_values)" function.
+Модель реализована с помощью функции "djmodel(Tx, n_a, n_values)".
 
-### Predicting and Sampling: <a name="MusicPredictingAndSampling"></a>
+### Прогнозирование и выборка: <a name="MusicPredictingAndSampling"></a>
 
-Adding model, predicting and sampling feature, model structure is: 
+Добавление модели, признаков прогнозирования и выборки, структура модели:
 
 <img width="1171" alt="music_gen" src="https://user-images.githubusercontent.com/10358317/44003040-d8f6335c-9e54-11e8-9260-ce930c271437.png">
 
-[Andrew Ng, Sequential Models Course, Deep Learning Specialization]
+[Эндрю Нг, Курс по последовательным моделям, Специализация по глубокому обучению]
 
-Music Inference Model is similar trained model and it is implemented with "music_inference_model(LSTM_cell, densor, n_values = 78, n_a = 64, Ty = 100)" function. Music is generated with "redict_and_sample" function.
-Finally, your generated music is saved in output/my_music.midi.
+Модель вывода музыки — это аналогичная обученная модель, реализованная с помощью функции "music_inference_model(LSTM_cell, densor, n_values ​​= 78, n_a = 64, Ty = 100)". Музыка генерируется с помощью функции "redict_and_sample".
+
+В итоге, созданная вами музыка сохраняется в файле output/my_music.midi.
 
 
 
